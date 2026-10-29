@@ -1,11 +1,10 @@
-package com.dam2.Main;
+package com.dam2.Flujo;
 
 import com.dam2.SQL.process;
-import com.dam2.SQL.sentenciasSQL;
 
 public class Main {
     public static void main(String[] args) {
        process.main(args);
-       sentenciasSQL.conectarBDD();
+        Menu.menu();
     }
 }
