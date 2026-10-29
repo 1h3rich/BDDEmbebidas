@@ -9,17 +9,17 @@ CREATE TABLE CLIENTE(
     nombre VARCHAR,
     persona_contacto VARCHAR,
     tlfno INT,
-    CIF VARCHAR
+    CIF INT
 );
 
 CREATE TABLE EMPLEADO(
     id_empleado INTEGER NOT NULL PRIMARY KEY,
+    id_departamento INTEGER REFERENCES DEPARTAMENTO(id_departamento),
+    id_proyecto INTEGER REFERENCES PROYECTO(id_proyecto)
     nombre VARCHAR,
     apellido VARCHAR,
     dni varchar,
-    salario FLOAT,
-    id_departamento INTEGER REFERENCES DEPARTAMENTO(id_departamento),
-    id_proyecto INTEGER REFERENCES PROYECTO(id_proyecto)
+    salario FLOAT
 );
 
 CREATE table PROYECTO(
