@@ -6,8 +6,8 @@ public class process {
     public static void main(String[] args) {
 
         Path sqlite = Path.of("C:\\SQLite\\sqlite3.exe"); //Ruta del sqlite
-        Path dbPath = Path.of("Ejercicio1\\ejercicio1\\assets\\actividad1.db"); // Ruta de la base de datos
-        Path dbScript = Path.of("Ejercicio1\\ejercicio1\\src\\main\\java\\com\\dam2\\SQL\\estructura.sql"); //Ruta de la estructura de la bdd
+        Path dbPath = Path.of("assets", "actividad1.db"); // Ruta de la base de datos
+        Path dbScript = Path.of("C:\\Users\\isard\\Desktop\\BDDEmbebidas\\Ejercicio1\\ejercicio1\\src\\main\\java\\com\\dam2\\SQL\\estructura.sql"); //Ruta de la estructura de la bdd
 
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(

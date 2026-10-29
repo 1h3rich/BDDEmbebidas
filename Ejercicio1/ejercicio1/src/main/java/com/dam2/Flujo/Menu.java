@@ -15,7 +15,7 @@ public class Menu {
 
     static Scanner sc = new Scanner(System.in);
 
-    public static void menu() throws Exception {
+    public static void menu() {
         System.out.println("Bienvenido a la bdd de la actividad 1");
 
         boolean salir = false;
@@ -28,7 +28,22 @@ public class Menu {
             opcion = sc.nextInt();
             switch (opcion) {
                 case 1:
-                    System.out.println("Ha seleccionado introducir a la BDD");
+                    try {
+                        introducirBDD();
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                default:
+                    break;
+            }
+        }
+
+    }
+
+    public static void introducirBDD()
+    {
+        System.out.println("Ha seleccionado introducir a la BDD");
                     System.out.println("Indique la tabla");
                     System.out.println("1. Departamento");
                     System.out.println("2. Empleado");
@@ -58,6 +73,7 @@ public class Menu {
                             tabla = "Departamento";
                             columnas = new String[] { "id_departamento", "nombre", "ubicacion" };
                             valores = new Object[] { id_departamento, nombre, ubicacion };
+                            sentenciasSQL.insertarDatos(con, tabla, columnas, valores);
 
                             break;
 
@@ -91,6 +107,7 @@ public class Menu {
                             columnas = new String[] { "id_empleado", "id_departamento", "id_proyecto", "nombre",
                                     "apellidos", "DNI", "salario" };
                             valores = new Object[] { id_empleado, id_departamento, id_proyecto, nombre, apellidos, dni, salario };
+                            sentenciasSQL.insertarDatos(con, tabla, columnas, valores);
                             break;
 
                         case 3:
@@ -116,6 +133,7 @@ public class Menu {
                             tabla = "Cliente";
                             columnas = new String[] { "id_cliente", "nombre", "persona_contacto", "tlfno", "CIF" };
                             valores = new Object[] { id_empleado, nombre, personaContacto, telefono, cif };
+                            sentenciasSQL.insertarDatos(con, tabla, columnas, valores);
                             break;
                         case 4:
                             System.out.println("--------------TABLAS--------------");
@@ -137,21 +155,13 @@ public class Menu {
                             tabla = "Proyecto";
                             columnas = new String[] { "id_proyecto", "nombre", "ubicacion", "id_cliente" };
                             valores = new Object[] { id_proyecto, nombre, ubicacion, id_cliente };
+                            sentenciasSQL.insertarDatos(con, tabla, columnas, valores);
                             break;
 
                         default:
                             System.out.println("Opcion no valida");
                             break;
                     }
-                    
-                    sentenciasSQL.insertarDatos(con, tabla, columnas, valores);
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
     }
 
 }
