@@ -1,5 +1,4 @@
 package com.dam2.SQL;
-
 import java.nio.file.Path;
 
 public class process {
