@@ -5,9 +5,9 @@ import java.nio.file.Path;
 public class process {
     public static void main(String[] args) {
 
-        Path sqlite = Path.of("C:\\SQLite\\sqlite3.exe"); //Ruta del sqlite
-        Path dbPath = Path.of("assets", "actividad1.db"); // Ruta de la base de datos
-        Path dbScript = Path.of("C:\\Users\\isard\\Desktop\\BDDEmbebidas\\Ejercicio1\\ejercicio1\\src\\main\\java\\com\\dam2\\SQL\\estructura.sql"); //Ruta de la estructura de la bdd
+        Path sqlite = Path.of("Programas\\SQLITE\\sqlite3.exe"); //Ruta del sqlite
+        Path dbPath = Path.of("Ejercicio1\\ejercicio1\\assets\\actividad.db"); // Ruta de la base de datos
+        Path dbScript = Path.of("Ejercicio1\\ejercicio1\\src\\main\\java\\com\\dam2\\SQL\\estructura.sql"); //Ruta de la estructura de la bdd
 
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(
@@ -22,17 +22,16 @@ public class process {
             Process p = processBuilder.start(); // Inicia el proceso
 
             System.out.println("Creando la base de datos...");
-            int resultado = p.waitFor();
-            if (resultado == 0) {
 
                 if(dbPath.toFile().exists()){
                     System.out.println("La base de datos ya existe.");
                 }else{
                     System.out.println("Base de datos creada correctamente.");
                 }
-                
-            } else {
-                System.err.println("Error al crear la base de datos.");
+
+            int resultado = p.waitFor();
+            if(resultado != 0){
+                System.err.println("Error al crear la base de datos");
             }
         } catch (Exception e) {
             e.printStackTrace();
