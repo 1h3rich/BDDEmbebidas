@@ -15,7 +15,7 @@ CREATE TABLE CLIENTE(
 CREATE TABLE EMPLEADO(
     id_empleado INTEGER NOT NULL PRIMARY KEY,
     id_departamento INTEGER REFERENCES DEPARTAMENTO(id_departamento),
-    id_proyecto INTEGER REFERENCES PROYECTO(id_proyecto)
+    id_proyecto INTEGER REFERENCES PROYECTO(id_proyecto),
     nombre VARCHAR,
     apellido VARCHAR,
     dni varchar,

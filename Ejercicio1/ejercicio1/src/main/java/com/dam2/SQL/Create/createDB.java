@@ -1,12 +1,12 @@
-package com.dam2.SQL;
+package com.dam2.SQL.Create;
 import java.nio.file.Path;
 
-public class process {
+public class createDB {
     public static void main(String[] args) {
 
         Path sqlite = Path.of("Programas\\SQLITE\\sqlite3.exe"); //Ruta del sqlite
-        Path dbPath = Path.of("Ejercicio1\\ejercicio1\\assets\\actividad.db"); // Ruta de la base de datos
-        Path dbScript = Path.of("Ejercicio1\\ejercicio1\\src\\main\\java\\com\\dam2\\SQL\\estructura.sql"); //Ruta de la estructura de la bdd
+        Path dbPath = Path.of("Ejercicio1\\ejercicio1\\assets\\actividad_1.db"); // Ruta de la base de datos
+        Path dbScript = Path.of("Ejercicio1\\ejercicio1\\src\\main\\java\\com\\dam2\\SQL\\Create\\estructura.sql"); //Ruta de la estructura de la bdd
 
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(

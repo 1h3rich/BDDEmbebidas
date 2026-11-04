@@ -2,12 +2,12 @@ package com.dam2.Flujo;
 
 import java.sql.Connection;
 import java.util.Scanner;
-
-import com.dam2.SQL.sentenciasSQL;
-
+import com.dam2.SQL.Conexion.*;
+import com.dam2.SQL.Inserts.*;
+import com.dam2.SQL.Select.*;
 public class Menu {
 
-    static Connection con = sentenciasSQL.conectarBDD();
+    static Connection con = OnOff.conectarBDD(); //Establecemos conexion.
 
     static int opcion;
     static String tabla;
@@ -16,33 +16,43 @@ public class Menu {
     static Scanner sc = new Scanner(System.in);
 
     public static void menu() {
+
+        System.out.println(con.toString());
+
         System.out.println("Bienvenido a la bdd de la actividad 1");
 
         boolean salir = false;
         while (!salir) {
+            System.out.println();
             System.out.println("Selecciona una opcion: ");
             System.out.println("1. Introducir a la BDD");
             System.out.println("2. Eliminar de la BDD");
             System.out.println("3. Editar de la BDD");
+            System.out.println("4. Consultar");
 
             opcion = sc.nextInt();
             switch (opcion) {
-                case 1:
-                    try {
-                        introducirBDD();
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                default:
+                case 1->{
+                    introducirBDD();
+                }
+                case 2 -> {
+                    
+                }   
+                case 3 -> {
+
+                } 
+                case 4 -> {
+                    consulta();
+                }
+                default->{
                     break;
+                }
             }
         }
 
     }
 
-    public static void introducirBDD()
-    {
+    public static void introducirBDD(){
         System.out.println("Ha seleccionado introducir a la BDD");
                     System.out.println("Indique la tabla");
                     System.out.println("1. Departamento");
@@ -73,7 +83,7 @@ public class Menu {
                             tabla = "Departamento";
                             columnas = new String[] { "id_departamento", "nombre", "ubicacion" };
                             valores = new Object[] { id_departamento, nombre, ubicacion };
-                            sentenciasSQL.insertarDatos(con, tabla, columnas, valores);
+                            Insert.insertarDatos(con, tabla, columnas, valores);
 
                             break;
 
@@ -107,7 +117,7 @@ public class Menu {
                             columnas = new String[] { "id_empleado", "id_departamento", "id_proyecto", "nombre",
                                     "apellidos", "DNI", "salario" };
                             valores = new Object[] { id_empleado, id_departamento, id_proyecto, nombre, apellidos, dni, salario };
-                            sentenciasSQL.insertarDatos(con, tabla, columnas, valores);
+                            Insert.insertarDatos(con, tabla, columnas, valores);
                             break;
 
                         case 3:
@@ -133,7 +143,7 @@ public class Menu {
                             tabla = "Cliente";
                             columnas = new String[] { "id_cliente", "nombre", "persona_contacto", "tlfno", "CIF" };
                             valores = new Object[] { id_empleado, nombre, personaContacto, telefono, cif };
-                            sentenciasSQL.insertarDatos(con, tabla, columnas, valores);
+                            Insert.insertarDatos(con, tabla, columnas, valores);
                             break;
                         case 4:
                             System.out.println("--------------TABLAS--------------");
@@ -155,13 +165,31 @@ public class Menu {
                             tabla = "Proyecto";
                             columnas = new String[] { "id_proyecto", "nombre", "ubicacion", "id_cliente" };
                             valores = new Object[] { id_proyecto, nombre, ubicacion, id_cliente };
-                            sentenciasSQL.insertarDatos(con, tabla, columnas, valores);
+                            Insert.insertarDatos(con, tabla, columnas, valores);
                             break;
 
                         default:
                             System.out.println("Opcion no valida");
                             break;
                     }
+    }
+
+    public static void consulta(){
+        System.out.println("Elije el tipo de consulta: ");
+        System.out.println("1. Query 1");
+        int opcion = sc.nextInt();
+        switch (opcion) {
+            case 1 ->{
+                System.out.println("Indique el dato: ");
+                String dato = sc.next();
+                System.out.println("Indique la tabla");
+                tabla = sc.next();
+                Querys.Query1(con, tabla, dato);
+            }        
+            default->{
+                break;
+            }
+        }
     }
 
 }
