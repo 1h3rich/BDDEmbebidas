@@ -3,11 +3,14 @@ package com.dam2.Flujo;
 import java.sql.Connection;
 import java.util.Scanner;
 import com.dam2.SQL.Conexion.*;
+import com.dam2.SQL.Delete.Delete;
+import com.dam2.SQL.Edit.Edit;
 import com.dam2.SQL.Inserts.*;
 import com.dam2.SQL.Select.*;
+
 public class Menu {
 
-    static Connection con = OnOff.conectarBDD(); //Establecemos conexion.
+    static Connection con = OnOff.conectarBDD(); // Establecemos conexion.
 
     static int opcion;
     static String tabla;
@@ -32,19 +35,20 @@ public class Menu {
 
             opcion = sc.nextInt();
             switch (opcion) {
-                case 1->{
+                case 1 -> {
                     introducirBDD();
                 }
                 case 2 -> {
-                    
-                }   
+                    eliminarBDD();
+                }
                 case 3 -> {
-
-                } 
+                    editarBDD();
+                }
                 case 4 -> {
                     consulta();
                 }
-                default->{
+                default -> {
+                    System.out.println("Opcion no disponible");
                     break;
                 }
             }
@@ -52,144 +56,207 @@ public class Menu {
 
     }
 
-    public static void introducirBDD(){
+    public static void introducirBDD() {
         System.out.println("Ha seleccionado introducir a la BDD");
-                    System.out.println("Indique la tabla");
-                    System.out.println("1. Departamento");
-                    System.out.println("2. Empleado");
-                    System.out.println("3. Cliente");
-                    System.out.println("4. Proyecto");
+        System.out.println("Indique la tabla");
+        System.out.println("1. Departamento");
+        System.out.println("2. Empleado");
+        System.out.println("3. Cliente");
+        System.out.println("4. Proyecto");
 
-                    opcion = sc.nextInt();
-                    String[] columnas;
-                    Object[] valores;
+        opcion = sc.nextInt();
+        String[] columnas;
+        Object[] valores;
 
-                    int id_departamento, id_proyecto, id_cliente, id_empleado, telefono, cif;
-                    String nombre, apellidos, ubicacion, dni, personaContacto;
-                    Float salario;
+        int id_departamento, id_proyecto, id_cliente, id_empleado, telefono, cif;
+        String nombre, apellido, ubicacion, dni, persona_contacto;
+        Float salario;
 
-                    switch (opcion) {
-                        case 1:
+        switch (opcion) {
+            case 1:
 
-                            System.out.println("--------------TABLAS--------------");
-                            System.out.println("[ID][NOMBRE][UBICACION]");
-                            System.out.print("id: ");
-                            id_departamento = sc.nextInt();
-                            System.out.print("nombre: ");
-                            nombre = sc.next();
-                            System.out.print("ubicacion: ");
-                            ubicacion = sc.next();
+                System.out.println("--------------TABLAS--------------");
+                System.out.println("[ID][NOMBRE][UBICACION]");
+                System.out.print("id: ");
+                id_departamento = sc.nextInt();
+                System.out.print("nombre: ");
+                nombre = sc.next();
+                System.out.print("ubicacion: ");
+                ubicacion = sc.next();
 
-                            tabla = "Departamento";
-                            columnas = new String[] { "id_departamento", "nombre", "ubicacion" };
-                            valores = new Object[] { id_departamento, nombre, ubicacion };
-                            Insert.insertarDatos(con, tabla, columnas, valores);
+                tabla = "Departamento";
+                columnas = new String[] { "id_departamento", "nombre", "ubicacion" };
+                valores = new Object[] { id_departamento, nombre, ubicacion };
+                Insert.insertarDatos(con, tabla, columnas, valores);
 
-                            break;
+                break;
 
-                        case 2:
-                            System.out.println("--------------TABLAS--------------");
-                            System.out.println(
-                                    "[ID_EMPLEADO][ID_DEPARTAMENTO][ID_PROYECTO][NOMBRE][APELLIDOS][DNI][SALARIO]");
-                            // id_empleado
-                            System.out.print("id: ");
-                            id_empleado = sc.nextInt();
-                            // id_departament
-                            System.out.print("id: ");
-                            id_departamento = sc.nextInt();
-                            // id_proyecto
-                            System.out.print("id: ");
-                            id_proyecto = sc.nextInt();
-                            // nombre
-                            System.out.print("nombre: ");
-                            nombre = sc.next();
-                            // ubicacion
-                            System.out.print("apellidos: ");
-                            apellidos = sc.next();
-                            // DNI
-                            System.out.print("DNI: ");
-                            dni = sc.next();
-                            // Salario
-                            System.out.print("salario: ");
-                            salario = sc.nextFloat();
+            case 2:
+                System.out.println("--------------TABLAS--------------");
+                System.out.println(
+                        "[ID_EMPLEADO][ID_DEPARTAMENTO][ID_PROYECTO][NOMBRE][APELLIDOS][DNI][SALARIO]");
+                // id_empleado
+                System.out.print("id empleado: ");
+                id_empleado = sc.nextInt();
+                // id_departament
+                System.out.print("id departamento: ");
+                id_departamento = sc.nextInt();
+                // id_proyecto
+                System.out.print("id proyecto: ");
+                id_proyecto = sc.nextInt();
+                // nombre
+                System.out.print("nombre: ");
+                nombre = sc.next();
+                // ubicacion
+                System.out.print("apellidos: ");
+                apellido = sc.next();
+                // DNI
+                System.out.print("DNI: ");
+                dni = sc.next();
+                // Salario
+                System.out.print("salario: ");
+                salario = sc.nextFloat();
 
-                            tabla = "Empleado";
-                            columnas = new String[] { "id_empleado", "id_departamento", "id_proyecto", "nombre",
-                                    "apellidos", "DNI", "salario" };
-                            valores = new Object[] { id_empleado, id_departamento, id_proyecto, nombre, apellidos, dni, salario };
-                            Insert.insertarDatos(con, tabla, columnas, valores);
-                            break;
+                tabla = "Empleado";
+                columnas = new String[] { "id_empleado", "id_departamento", "id_proyecto", "nombre",
+                        "apellidos", "DNI", "salario" };
+                valores = new Object[] { id_empleado, id_departamento, id_proyecto, nombre, apellido, dni, salario };
+                Insert.insertarDatos(con, tabla, columnas, valores);
+                break;
 
-                        case 3:
-                            System.out.println("--------------TABLAS--------------");
-                            System.out.println(
-                                    "[ID_CLIENTE][NOMBRE][PERSONA DE CONTACTO][TELEFONO][CIF]");
-                            // id_empleado
-                            System.out.print("id: ");
-                            id_empleado = sc.nextInt();
-                            // nombre
-                            System.out.print("nombre: ");
-                            nombre = sc.next();
-                            // persona contacto
-                            System.out.print("persona contacto: ");
-                            personaContacto = sc.next();
-                            // telefono
-                            System.out.print("telefono: ");
-                            telefono = sc.nextInt();
-                            // CIF, Numero de identificacion fiscal
-                            System.out.print("CIF: ");
-                            cif = sc.nextInt();
+            case 3:
+                System.out.println("--------------TABLAS--------------");
+                System.out.println(
+                        "[ID_CLIENTE][NOMBRE][PERSONA DE CONTACTO][TELEFONO][CIF]");
+                // id_empleado
+                System.out.print("id cliente: ");
+                id_empleado = sc.nextInt();
+                // nombre
+                System.out.print("nombre: ");
+                nombre = sc.next();
+                // persona contacto
+                System.out.print("persona contacto: ");
+                persona_contacto = sc.next();
+                // telefono
+                System.out.print("telefono: ");
+                telefono = sc.nextInt();
+                // CIF, Numero de identificacion fiscal
+                System.out.print("CIF: ");
+                cif = sc.nextInt();
 
-                            tabla = "Cliente";
-                            columnas = new String[] { "id_cliente", "nombre", "persona_contacto", "tlfno", "CIF" };
-                            valores = new Object[] { id_empleado, nombre, personaContacto, telefono, cif };
-                            Insert.insertarDatos(con, tabla, columnas, valores);
-                            break;
-                        case 4:
-                            System.out.println("--------------TABLAS--------------");
-                            System.out.println(
-                                    "[ID_CLIENTE][NOMBRE][PERSONA DE CONTACTO][TELEFONO][CIF]");
-                            // id_proyecto
-                            System.out.print("id: ");
-                            id_proyecto = sc.nextInt();
-                            // nombre
-                            System.out.print("nombre: ");
-                            nombre = sc.next();
-                            // ubicacion
-                            System.out.print("ubicacion: ");
-                            ubicacion = sc.next();
-                            // id_cliente
-                            System.out.print("id_cliente: ");
-                            id_cliente = sc.nextInt();
+                tabla = "Cliente";
+                columnas = new String[] { "id_cliente", "nombre", "persona_contacto", "tlfno", "CIF" };
+                valores = new Object[] { id_empleado, nombre, persona_contacto, telefono, cif };
+                Insert.insertarDatos(con, tabla, columnas, valores);
+                break;
+            case 4:
+                System.out.println("--------------TABLAS--------------");
+                System.out.println(
+                        "[ID_CLIENTE][NOMBRE][PERSONA DE CONTACTO][TELEFONO][CIF]");
+                // id_proyecto
+                System.out.print("id: ");
+                id_proyecto = sc.nextInt();
+                // nombre
+                System.out.print("nombre: ");
+                nombre = sc.next();
+                // ubicacion
+                System.out.print("ubicacion: ");
+                ubicacion = sc.next();
+                // id_cliente
+                System.out.print("id_cliente: ");
+                id_cliente = sc.nextInt();
 
-                            tabla = "Proyecto";
-                            columnas = new String[] { "id_proyecto", "nombre", "ubicacion", "id_cliente" };
-                            valores = new Object[] { id_proyecto, nombre, ubicacion, id_cliente };
-                            Insert.insertarDatos(con, tabla, columnas, valores);
-                            break;
+                tabla = "Proyecto";
+                columnas = new String[] { "id_proyecto", "nombre", "ubicacion", "id_cliente" };
+                valores = new Object[] { id_proyecto, nombre, ubicacion, id_cliente };
+                Insert.insertarDatos(con, tabla, columnas, valores);
+                break;
 
-                        default:
-                            System.out.println("Opcion no valida");
-                            break;
-                    }
+            default:
+                System.out.println("Opcion no valida");
+                break;
+        }
     }
 
-    public static void consulta(){
+    public static void consulta() {
         System.out.println("Elije el tipo de consulta: ");
         System.out.println("1. Query 1");
         int opcion = sc.nextInt();
         switch (opcion) {
-            case 1 ->{
+            case 1 -> {
                 System.out.println("Indique el dato: ");
                 String dato = sc.next();
                 System.out.println("Indique la tabla");
                 tabla = sc.next();
                 Querys.Query1(con, tabla, dato);
-            }        
-            default->{
+            }
+            default -> {
                 break;
             }
         }
+    }
+
+    public static void eliminarBDD() {
+        System.out.println("Elija la tabla donde quiere eliminar informacion");
+        System.out.println("Indique la tabla");
+        System.out.println("1. Departamento");
+        System.out.println("2. Empleado");
+        System.out.println("3. Cliente");
+        System.out.println("4. Proyecto");
+
+        int id = 0;
+        opcion = sc.nextInt();
+        String tabla = "";
+        
+        if(opcion == 1)  tabla = "Departamento";
+        if(opcion == 2)  tabla = "Empleado";
+        if(opcion == 3)  tabla = "Cliente";
+        if(opcion == 4)  tabla = "Proyecto";
+
+        switch (opcion) {
+            case 1,2,3,4 -> {
+                System.out.println("Indique la id a eliminar");
+                id = sc.nextInt();
+                Delete.delete(con, tabla, id);
+            }
+            default -> {
+                System.out.println("Opcion no permitida");
+            }
+        }
+
+    }
+    public static void editarBDD() {
+        System.out.println("Elija la tabla donde quiere eliminar informacion");
+        System.out.println("Indique la tabla");
+        System.out.println("1. Departamento");
+        System.out.println("2. Empleado");
+        System.out.println("3. Cliente");
+        System.out.println("4. Proyecto");
+
+        int id = 0;
+        opcion = sc.nextInt();
+        String tabla = "";
+        
+        if(opcion == 1)  tabla = "Departamento";
+        if(opcion == 2)  tabla = "Empleado";
+        if(opcion == 3)  tabla = "Cliente";
+        if(opcion == 4)  tabla = "Proyecto";
+
+        switch (opcion) {
+            case 1,2,3,4 -> {
+                System.out.println("Indique la id a editar");
+                id = sc.nextInt();
+                System.out.println("Indique la columna");
+                String columna = sc.next();
+                System.out.println("Indique el nuevo valor");
+                String valor = sc.next();
+                Edit.edit(con, tabla, id, columna, valor);
+            }
+            default -> {
+                System.out.println("Opcion no permitida");
+            }
+        }
+
     }
 
 }
