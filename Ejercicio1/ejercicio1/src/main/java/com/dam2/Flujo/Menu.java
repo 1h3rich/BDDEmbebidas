@@ -68,8 +68,8 @@ public class Menu {
         String[] columnas;
         Object[] valores;
 
-        int id_departamento, id_proyecto, id_cliente, id_empleado, telefono, cif;
-        String nombre, apellido, ubicacion, dni, persona_contacto;
+        int id_departamento, id_proyecto, id_cliente, id_empleado;
+        String nombre, apellido, ubicacion, dni, persona_contacto, telefono, cif;
         Float salario;
 
         switch (opcion) {
@@ -139,10 +139,10 @@ public class Menu {
                 persona_contacto = sc.next();
                 // telefono
                 System.out.print("telefono: ");
-                telefono = sc.nextInt();
+                telefono = sc.next();
                 // CIF, Numero de identificacion fiscal
                 System.out.print("CIF: ");
-                cif = sc.nextInt();
+                cif = sc.next();
 
                 tabla = "Cliente";
                 columnas = new String[] { "id_cliente", "nombre", "persona_contacto", "tlfno", "CIF" };
@@ -180,7 +180,8 @@ public class Menu {
 
     public static void consulta() {
         System.out.println("Elije el tipo de consulta: ");
-        System.out.println("1. Query 1");
+        System.out.println("1. Query básica");
+        System.out.println("2. Busqueda por id");
         int opcion = sc.nextInt();
         switch (opcion) {
             case 1 -> {
@@ -190,7 +191,18 @@ public class Menu {
                 tabla = sc.next();
                 Querys.Query1(con, tabla, dato);
             }
+            case 2 -> {
+                System.out.println("Indique el dato");
+                String dato = sc.next();
+                System.out.println("Indique la tabla");
+                tabla = sc.next();
+                System.out.println("Indique la id");
+                int id = sc.nextInt();
+                Querys.Query2(con, tabla, dato, id);
+            }
+
             default -> {
+                System.out.println("opcion no valida");
                 break;
             }
         }
@@ -226,7 +238,7 @@ public class Menu {
 
     }
     public static void editarBDD() {
-        System.out.println("Elija la tabla donde quiere eliminar informacion");
+        System.out.println("Elija la tabla donde quiere editar informacion");
         System.out.println("Indique la tabla");
         System.out.println("1. Departamento");
         System.out.println("2. Empleado");
