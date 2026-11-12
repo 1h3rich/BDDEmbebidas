@@ -32,6 +32,7 @@ public class Menu {
             System.out.println("2. Eliminar de la BDD");
             System.out.println("3. Editar de la BDD");
             System.out.println("4. Consultar");
+            System.out.println("0. Salir");
 
             opcion = sc.nextInt();
             switch (opcion) {
@@ -46,6 +47,11 @@ public class Menu {
                 }
                 case 4 -> {
                     consulta();
+                }
+                case 0 -> {
+                    salir = true;
+                    OnOff.desconectarBDD(con);
+                    System.out.println("Hasta pronto");
                 }
                 default -> {
                     System.out.println("Opcion no disponible");
@@ -315,9 +321,13 @@ public class Menu {
                 String dato = sc.next();
                 System.out.println("Indique la tabla");
                 tabla = sc.next();
-                System.out.println("Indique la id");
-                int id = sc.nextInt();
-                Crud.Query2(con, tabla, dato, id);
+                String[] clave = columnasClave(tabla);
+                if (clave.length == 0) {
+                    System.out.println("Tabla no valida");
+                } else {
+                    Object[] valoresClave = pedirClave(clave);
+                    Crud.Query2(con, tabla, dato, clave, valoresClave);
+                }
             }
 
             default -> {
@@ -433,6 +443,21 @@ public class Menu {
             case 6 -> new String[] { "dni_alumno", "codigo_asignatura" };
             case 7 -> new String[] { "id_incidencia" };
             case 8 -> new String[] { "codigo_asignatura", "codigo_aula", "mes", "dia", "hora" };
+            default -> new String[0];
+        };
+    }
+
+    // Igual que columnasClave(int) pero a partir del nombre de la tabla
+    private static String[] columnasClave(String tabla) {
+        return switch (tabla.toUpperCase()) {
+            case "PROFESOR" -> columnasClave(1);
+            case "ALUMNO" -> columnasClave(2);
+            case "CURSO" -> columnasClave(3);
+            case "AULA" -> columnasClave(4);
+            case "ASIGNATURA" -> columnasClave(5);
+            case "MATRICULA" -> columnasClave(6);
+            case "INCIDENCIA" -> columnasClave(7);
+            case "HORARIO" -> columnasClave(8);
             default -> new String[0];
         };
     }

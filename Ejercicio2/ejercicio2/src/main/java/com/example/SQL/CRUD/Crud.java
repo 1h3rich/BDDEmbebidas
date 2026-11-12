@@ -30,75 +30,60 @@ public class Crud {
     }
 
     /**
-     * Permite obtener un dato de una tabla.
-     * SELECT dato FROM tabla.
-     * 
+     * SELECT dato FROM tabla. Imprime todas las columnas que devuelva la consulta.
+     *
      * @con conexion BDD
      * @tabla tabla de la cual queremos datos
-     * @dato dato que queremos obtener de la tabla.
-     * 
+     * @dato columna(s) que queremos obtener (o * para todas)
      */
     public static void Query1(Connection con, String tabla, String dato) {
 
-        String sql = "SELECT " + dato + " FROM " + tabla; // Sentencia sql
+        String sql = "SELECT " + dato + " FROM " + tabla;
 
-        try (PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) { // evita que haya
-                                                                                                   // inserccion sql
-                                                                                                   // maliciosa
-
-            while (rs.next()) {
-                System.out.println();
-                System.out.print("|");
-                System.out.print(rs.getString("id_departamento"));
-                System.out.print("| ");
-                System.out.print(rs.getString("nombre"));
-                System.out.print("| ");
-                System.out.println(rs.getString("ubicacion"));
-            }
-            rs.close();
-            ps.close();
+        try (PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            imprimir(rs);
         } catch (SQLException e) {
-            System.out.println(
-                    "Error en la BB: " + e.getMessage());
+            System.out.println("Error en la BD: " + e.getMessage());
             e.printStackTrace();
         }
-
     }
 
     /**
-     * Permite obtener un dato de una tabla.
-     * SELECT dato FROM tabla.
-     * 
-     * @con conexion BDD
-     * @tabla tabla de la cual queremos datos
-     * @dato dato que queremos obtener de la tabla.
-     * 
+     * SELECT dato FROM tabla WHERE clave1 = ? AND clave2 = ? ...
      */
-    public static void Query2(Connection con, String tabla, String dato, int id) {
+    public static void Query2(Connection con, String tabla, String dato, String[] columnasClave,
+            Object[] valoresClave) {
 
-        String sql = "SELECT " + dato + " FROM " + tabla + " WHERE ID = " + id; // Sentencia sql
+        String sql = "SELECT " + dato + " FROM " + tabla + " WHERE " + condicion(columnasClave);
 
-        try (PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) { // evita que haya
-                                                                                                   // inserccion sql
-                                                                                                   // maliciosa
-
-            while (rs.next()) {
-                System.out.println();
-                System.out.print("|");
-                System.out.print(rs.getString("id_departamento"));
-                System.out.print("| ");
-                System.out.print(rs.getString("nombre"));
-                System.out.print("| ");
-                System.out.println(rs.getString("ubicacion"));
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            for (int i = 0; i < valoresClave.length; i++) {
+                ps.setObject(i + 1, valoresClave[i]);
             }
-            rs.close();
-            ps.close();
+            try (ResultSet rs = ps.executeQuery()) {
+                imprimir(rs);
+            }
         } catch (SQLException e) {
-            System.out.println(
-                    "Error en la BB: " + e.getMessage());
+            System.out.println("Error en la BD: " + e.getMessage());
             e.printStackTrace();
         }
+    }
 
+    // Imprime cualquier ResultSet: |col1| col2| col3
+    private static void imprimir(ResultSet rs) throws SQLException {
+        int columnas = rs.getMetaData().getColumnCount();
+        boolean hayFilas = false;
+        while (rs.next()) {
+            hayFilas = true;
+            System.out.print("|");
+            for (int c = 1; c <= columnas; c++) {
+                System.out.print(rs.getString(c));
+                System.out.print(c < columnas ? "| " : "");
+            }
+            System.out.println();
+        }
+        if (!hayFilas)
+            System.out.println("Sin resultados");
     }
 
     /**
