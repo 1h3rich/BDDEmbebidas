@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Thu Nov 12 17:59:50 CET 2026:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.16.1.1 - (1901046): instance a816c00e-01a1-d0b3-8b9f-00000f78e930 
+on database directory C:\Users\isard\Desktop\BDDEmbebidas\Ejercicio2\ejercicio2\assets\Actividad2 with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@73d16e93 
+Loaded from file:/C:/Users/isard/.m2/repository/org/apache/derby/derby/10.16.1.1/derby-10.16.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=18.0.1.1+2-6
+user.dir=C:\Users\isard\Desktop\BDDEmbebidas\Ejercicio2
+os.name=Windows 10
+os.arch=amd64
+os.version=10.0
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

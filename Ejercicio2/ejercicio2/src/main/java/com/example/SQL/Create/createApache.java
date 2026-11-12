@@ -1,19 +1,20 @@
 package com.example.SQL.Create;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.nio.file.Path;
 
 public class createApache {
     public static void main(String[] args) {
 
         Path apache = Path.of("Programas\\Apache Derby\\bin\\ij.bat"); //Ruta del apache
-        Path dbPath = Path.of("Ejercicio2\\ejercicio2\\assets"); // Ruta de la base de datos
+        Path dbPath = Path.of("Ejercicio2\\ejercicio2\\assets\\"); // Ruta de la base de datos
         Path dbScript = Path.of("ejercicio2\\src\\main\\java\\com\\example\\SQL\\Create\\estructura.sql"); //Ruta de la estructura de la bdd
 
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(
-                    apache.toString(),                          //Proceso que permite llamar al sqlite.exe, la ruta de la bdd
-                    dbPath.toString(),                          //llamar al script y si encuentra un fallo detenerse (-bail)
-                    "-bail",                                    //El codigo crea un proceso que ejecuta en segundo plano lo necesario para la bdd
-                    dbScript.toString()
+                    "cmd.exe",                    //
+                    "/c",                                    //Abre el cmd, ejecuta el siguiente comando, cierrate
+                    apache.toAbsolutePath().toString()
             );              
 
             processBuilder.redirectInput(dbScript.toFile());  // Redirige la entrada del proceso al archivo de script SQL

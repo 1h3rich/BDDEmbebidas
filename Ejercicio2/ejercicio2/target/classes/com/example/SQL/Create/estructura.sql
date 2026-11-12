@@ -1,3 +1,5 @@
+CONNECT 'jdbc:derby:ejercicio2/assets/Actividad2;create=true';
+
 CREATE TABLE PROFESOR (
     dni VARCHAR(15) PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
@@ -230,3 +232,6 @@ INSERT INTO HORARIO VALUES
 (7, 301, 3, 11, 11),
 (8, 301, 3, 12, 12),
 (8, 202, 3, 13, 9);
+
+
+EXIT;
