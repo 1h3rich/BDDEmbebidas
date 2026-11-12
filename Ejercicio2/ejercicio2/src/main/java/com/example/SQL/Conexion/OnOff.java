@@ -1,10 +1,8 @@
-package com.dam2.SQL.Conexion;
+package com.example.SQL.Conexion;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-import com.dam2.utilsLocal.utils;
 
 public class OnOff {
 

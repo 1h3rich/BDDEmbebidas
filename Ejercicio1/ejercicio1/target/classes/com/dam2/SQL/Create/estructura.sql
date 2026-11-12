@@ -1,39 +1,43 @@
-CREATE TABLE DEPARTAMENTO(
+
+PRAGMA foreign_keys = ON;
+
+-- =====================================
+-- CREACIÓN DE TABLAS
+-- =====================================
+
+CREATE TABLE DEPARTAMENTO (
     id_departamento INTEGER NOT NULL PRIMARY KEY,
-    nombre VARCHAR,
-    ubicacion VARCHAR
+    nombre VARCHAR(100),
+    ubicacion VARCHAR(100)
 );
 
-CREATE TABLE CLIENTE(
+CREATE TABLE CLIENTE (
     id_cliente INTEGER NOT NULL PRIMARY KEY,
-    nombre VARCHAR,
-    persona_contacto VARCHAR,
-    tlfno VARCHAR
-    ,
-    CIF VARCHAR
+    nombre VARCHAR(100),
+    persona_contacto VARCHAR(100),
+    tlfno VARCHAR(15),
+    CIF VARCHAR(20)
 );
 
-CREATE TABLE EMPLEADO(
-    id_empleado INTEGER NOT NULL PRIMARY KEY,
-    id_departamento INTEGER REFERENCES DEPARTAMENTO(id_departamento),
-    id_proyecto INTEGER REFERENCES PROYECTO(id_proyecto),
-    nombre VARCHAR,
-    apellido VARCHAR,
-    dni varchar,
-    salario FLOAT
-);
-
-CREATE table PROYECTO(
+CREATE TABLE PROYECTO (
     id_proyecto INTEGER NOT NULL PRIMARY KEY,
-    nombre VARCHAR,
-    ubicacion VARCHAR,
+    nombre VARCHAR(100),
+    ubicacion VARCHAR(100),
     id_cliente INTEGER REFERENCES CLIENTE(id_cliente)
 );
 
--- Generado con IA (Los Inserts)
+CREATE TABLE EMPLEADO (
+    id_empleado INTEGER NOT NULL PRIMARY KEY,
+    id_departamento INTEGER REFERENCES DEPARTAMENTO(id_departamento),
+    id_proyecto INTEGER REFERENCES PROYECTO(id_proyecto),
+    nombre VARCHAR(100),
+    apellido VARCHAR(100),
+    dni VARCHAR(9),
+    salario FLOAT
+);
 
 -- =====================================
--- DEPARTAMENTO
+-- INSERTS DEPARTAMENTO
 -- =====================================
 
 INSERT INTO DEPARTAMENTO VALUES
@@ -43,21 +47,19 @@ INSERT INTO DEPARTAMENTO VALUES
 (4, 'Marketing', 'Sevilla'),
 (5, 'Desarrollo', 'Zaragoza');
 
-
 -- =====================================
--- CLIENTE
+-- INSERTS CLIENTE
 -- =====================================
 
 INSERT INTO CLIENTE VALUES
-(1, 'Google', 'Carlos Pérez', 612345678, 12345678),
-(2, 'Microsoft', 'Ana García', 623456789, 23456789),
-(3, 'Amazon', 'Luis Martín', 634567890, 34567890),
-(4, 'Apple', 'María López', 645678901, 45678901),
-(5, 'Samsung', 'Pedro Sánchez', 656789012, 56789012);
-
+(1, 'Google', 'Carlos Pérez', '612345678', '12345678'),
+(2, 'Microsoft', 'Ana García', '623456789', '23456789'),
+(3, 'Amazon', 'Luis Martín', '634567890', '34567890'),
+(4, 'Apple', 'María López', '645678901', '45678901'),
+(5, 'Samsung', 'Pedro Sánchez', '656789012', '56789012');
 
 -- =====================================
--- PROYECTO
+-- INSERTS PROYECTO
 -- =====================================
 
 INSERT INTO PROYECTO VALUES
@@ -68,9 +70,8 @@ INSERT INTO PROYECTO VALUES
 (5, 'Inteligencia Artificial', 'Zaragoza', 5),
 (6, 'Base de Datos', 'Madrid', 1);
 
-
 -- =====================================
--- EMPLEADO
+-- INSERTS EMPLEADO
 -- =====================================
 
 INSERT INTO EMPLEADO VALUES
@@ -84,4 +85,3 @@ INSERT INTO EMPLEADO VALUES
 (8, 2, 2, 'Elena', 'Torres', '89012345H', 24000),
 (9, 3, 3, 'Mario', 'Díaz', '90123456J', 29000),
 (10, 5, 5, 'Sofía', 'Ruiz', '01234567K', 35000);
-

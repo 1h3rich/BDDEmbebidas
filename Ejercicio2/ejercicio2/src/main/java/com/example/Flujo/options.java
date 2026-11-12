@@ -1,6 +1,9 @@
-import utilsLocal;
+package com.example.Flujo;
+import java.util.Scanner;
 
-public class Options {
+import com.example.utilsLocal.utils;
+
+public class options {
 
     public static String decidirConexion(){
 
@@ -13,19 +16,22 @@ public class Options {
         int opcion = sc.nextInt();
         switch(opcion){
             case 1 -> {
+                sc.close();
                 return utils.URL_APACHE;
             }
             case 2 ->{
+                sc.close();
 
             }
             case 3 ->{
-
+                sc.close();
              
             }
             default ->{
-                System.out.pritnln("opcion no permitida");
+                System.out.println("opcion no permitida");
             }
         }
+        sc.close();
         return "";
     }
 

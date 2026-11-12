@@ -1,16 +1,16 @@
-package com.dam2.SQL.Create;
+package com.example.SQL.Create;
 import java.nio.file.Path;
 
 public class createApache {
     public static void main(String[] args) {
 
-        Path sqlite = Path.of("Programas\\Apache Derby\\ij.exe"); //Ruta del sqlite
-        Path dbPath = Path.of("Ejercicio2\\ejercicio2\\assets\\actividad_2.db"); // Ruta de la base de datos
-        Path dbScript = Path.of("Ejercicio2\\ejercicio2\\src\\main\\java\\com\\example\\SQL\\Create\\estructura.sql"); //Ruta de la estructura de la bdd
+        Path apache = Path.of("Programas\\Apache Derby\\bin\\ij.bat"); //Ruta del apache
+        Path dbPath = Path.of("Ejercicio2\\ejercicio2\\assets"); // Ruta de la base de datos
+        Path dbScript = Path.of("ejercicio2\\src\\main\\java\\com\\example\\SQL\\Create\\estructura.sql"); //Ruta de la estructura de la bdd
 
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(
-                    sqlite.toString(),                          //Proceso que permite llamar al sqlite.exe, la ruta de la bdd
+                    apache.toString(),                          //Proceso que permite llamar al sqlite.exe, la ruta de la bdd
                     dbPath.toString(),                          //llamar al script y si encuentra un fallo detenerse (-bail)
                     "-bail",                                    //El codigo crea un proceso que ejecuta en segundo plano lo necesario para la bdd
                     dbScript.toString()

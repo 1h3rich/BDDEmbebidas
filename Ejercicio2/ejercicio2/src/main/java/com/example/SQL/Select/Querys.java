@@ -1,4 +1,4 @@
-package com.dam2.SQL.Select;
+package com.example.SQL.Select;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

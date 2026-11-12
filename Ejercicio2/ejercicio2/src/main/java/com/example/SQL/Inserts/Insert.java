@@ -1,4 +1,4 @@
-package com.dam2.SQL.Inserts;
+package com.example.SQL.Inserts;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

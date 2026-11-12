@@ -1,7 +1,7 @@
-package com.dam2.SQL.Create;
+package com.example.SQL.Create;
 import java.nio.file.Path;
 
-public class createApache {
+public class createH2 {
     public static void main(String[] args) {
 
         Path sqlite = Path.of("Programas\\Apache Derby\\ij.exe"); //Ruta del sqlite

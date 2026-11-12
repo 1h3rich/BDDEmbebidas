@@ -1,4 +1,4 @@
-package com.dam2.SQL.Edit;
+package com.example.SQL.Edit;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -1,4 +1,4 @@
-package com.dam2.SQL.Delete;
+package com.example.SQL.Delete;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
