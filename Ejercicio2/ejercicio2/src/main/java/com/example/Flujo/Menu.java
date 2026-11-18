@@ -6,21 +6,21 @@ import java.time.LocalDate;
 import java.util.Scanner;
 
 import com.example.SQL.CRUD.Crud;
-import com.example.SQL.Conexion.OnOff;
+import com.example.utilsLocal.utils;
 
 public class Menu {
 
-    static Connection con = OnOff.conectarBDD(options.decidirConexion()); // Establecemos conexion.
+    static Connection con; // la conexion la abre y la cierra Main
 
     static int opcion;
     static String tabla;
     static String[] valores;
 
-    static Scanner sc = new Scanner(System.in);
+    static Scanner sc = utils.SC; // mismo Scanner que options
 
-    public static void menu() {
+    public static void menu(Connection conexion) {
 
-        System.out.println(con.toString());
+        con = conexion;
 
         System.out.println("Bienvenido a la bdd de la actividad 2");
 
@@ -50,7 +50,6 @@ public class Menu {
                 }
                 case 0 -> {
                     salir = true;
-                    OnOff.desconectarBDD(con);
                     System.out.println("Hasta pronto");
                 }
                 default -> {
@@ -349,7 +348,6 @@ public class Menu {
         System.out.println("7. INCIDENCIA");
         System.out.println("8. HORARIO");
 
-        int id = 0;
         opcion = sc.nextInt();
         String tabla = "";
 
@@ -433,7 +431,8 @@ public class Menu {
 
     }
 
-    // Columnas que forman la clave primaria de cada tabla (segun el numero del menu)
+    // Columnas que forman la clave primaria de cada tabla (segun el numero del
+    // menu)
     private static String[] columnasClave(int opcion) {
         return switch (opcion) {
             case 1, 2 -> new String[] { "dni" };
@@ -462,7 +461,8 @@ public class Menu {
         };
     }
 
-    // Pide por teclado el valor de cada columna clave (dni_* = texto, el resto = entero)
+    // Pide por teclado el valor de cada columna clave (dni_* = texto, el resto =
+    // entero)
     private static Object[] pedirClave(String[] columnas) {
         Object[] valores = new Object[columnas.length];
         for (int i = 0; i < columnas.length; i++) {

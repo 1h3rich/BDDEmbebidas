@@ -1,19 +1,24 @@
 package com.example.Flujo;
 
-import com.example.SQL.Create.createApache;
-import com.example.SQL.Create.createH2;
-import com.example.SQL.Create.createHSQLDB;
+import java.sql.Connection;
+
+import com.example.SQL.Conexion.OnOff;
+import com.example.SQL.Create.ScriptSQL;
 
 public class Main {
     public static void main(String[] args) {
-        createApache.main(args);
-        createH2.main(args);
-        createHSQLDB.main(args);
 
-        try {
-            Menu.menu();
+        String url = options.decidirConexion();
+
+        try (Connection con = OnOff.conectarBDD(url)) {
+            if (con == null) {
+                System.out.println("No se pudo conectar. Revisa el error de arriba.");
+                return;
+            }
+            ScriptSQL.crearSiNoExiste(con); // crea las tablas si no existen
+            Menu.menu(con);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }
