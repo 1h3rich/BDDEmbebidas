@@ -11,23 +11,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * =====================================================================
- *  DAO de Clientes: ClienteDaoImpl
- * =====================================================================
- *
- * Funciona exactamente igual que VideojuegoDaoImpl (mira sus comentarios si
- * tienes dudas sobre PreparedStatement o try-with-resources).
- * Solo cambian la tabla y las columnas.
- *
- * Esto es justo la gracia del patrón DAO + interfaz genérica:
- * todos los DAO tienen los mismos métodos, aunque cada uno trabaje con su tabla.
- *
- * Para conseguir este DAO se usa: DaoFactory.getClienteDao()
- */
 public class ClienteDaoImpl implements IDao<Cliente, Integer> {
 
-    /** Pide al Singleton la conexión compartida. */
     private Connection obtenerConexion() throws SQLException {
         return ConexionBD.getInstancia().getConexion();
     }
@@ -89,7 +74,6 @@ public class ClienteDaoImpl implements IDao<Cliente, Integer> {
 
             int filasInsertadas = sentencia.executeUpdate();
 
-            // Guardamos en el objeto el id que ha generado la base de datos
             try (ResultSet idsGenerados = sentencia.getGeneratedKeys()) {
                 if (idsGenerados.next()) {
                     cliente.setId(idsGenerados.getInt(1));
@@ -119,12 +103,11 @@ public class ClienteDaoImpl implements IDao<Cliente, Integer> {
 
         try (PreparedStatement sentencia = obtenerConexion().prepareStatement(sql)) {
             sentencia.setInt(1, id);
-            // Si el cliente tiene ventas, la clave foránea impide borrarlo -> SQLException
+
             return sentencia.executeUpdate() > 0;
         }
     }
 
-    /** Convierte la fila actual del ResultSet en un objeto Cliente. */
     private Cliente convertirFilaEnCliente(ResultSet fila) throws SQLException {
         return new Cliente(
                 fila.getInt("id"),

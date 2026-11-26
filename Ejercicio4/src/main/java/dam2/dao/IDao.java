@@ -1,9 +1,11 @@
 package dam2.dao;
 
-public interface IDao {
-    boolean insertar(Object obj);
+import java.util.List;
+
+public interface IDao<T> {
+    boolean insertar(T objeto);
     boolean eliminar(int id);
-    boolean modificar(Object obj);
-    Object buscarPorId(int id);
-    Object buscarTodos();
+    boolean modificar(T objeto);
+    T buscarPorId(int id);
+    List<T> buscarTodos();
 }

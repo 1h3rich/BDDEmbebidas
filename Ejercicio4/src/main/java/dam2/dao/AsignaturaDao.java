@@ -1,34 +1,48 @@
 package dam2.dao;
 
-public class AsignaturaDao implements IDao {
+import com.db4o.ObjectSet;
+import com.db4o.query.Query;
+import dam2.modelo.Alumno;
+import dam2.modelo.Asignatura;
+
+import java.util.List;
+
+public class AsignaturaDao extends DaoBase<Asignatura> {
+    public AsignaturaDao() {
+        super(Asignatura.class);
+    }
+
     @Override
-    public boolean insertar(Object obj) {
-        // Implementación de la inserción de una asignatura en la base de datos
-        return false;
+    protected int obtenerId(Asignatura asignatura) {
+        return asignatura.getId();
+    }
+
+    @Override
+    protected void copiarDatos(Asignatura origen, Asignatura destino) {
+        destino.setNombre(origen.getNombre());
+        destino.setProfesor(origen.getProfesor());
+        destino.setCurso(origen.getCurso());
+        destino.setAlumnos(origen.getAlumnos());
     }
 
     @Override
     public boolean eliminar(int id) {
-        // Implementación de la eliminación de una asignatura por su ID
-        return false;
+        Asignatura asignatura = buscarPorId(id);
+        if (asignatura == null) {
+            return false;
+        }
+        for (Alumno alumno : asignatura.getAlumnos()) {
+            alumno.getAsignaturas().removeIf(actual -> actual.getId() == id);
+            db().set(alumno);
+        }
+        return super.eliminar(id);
     }
 
-    @Override
-    public boolean modificar(Object obj) {
-        // Implementación de la modificación de una asignatura en la base de datos
-        return false;
+    public List<Asignatura> buscarPorCursoSoda(int idCurso) {
+        Query consulta = db().query();
+        consulta.constrain(Asignatura.class);
+        consulta.descend("curso").descend("id").constrain(idCurso);
+        ObjectSet resultado = consulta.execute();
+        return convertir(resultado);
     }
-
-    @Override
-    public Object buscarPorId(int id) {
-        // Implementación de la búsqueda de una asignatura por su ID
-        return null;
-    }
-
-    @Override
-    public Object buscarTodos() {
-        // Implementación de la búsqueda de todas las asignaturas en la base de datos
-        return null;
-    }
-
 }

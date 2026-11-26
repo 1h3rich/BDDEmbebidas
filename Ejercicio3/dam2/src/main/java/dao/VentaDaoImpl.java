@@ -13,60 +13,15 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * =====================================================================
- *  DAO de Ventas: VentaDaoImpl  (con TRANSACCIONES)
- * =====================================================================
- *
- * Las consultas (listar y buscar) son como en los otros DAO.
- * Lo especial está en insertar, modificar y eliminar, porque una venta
- * también cambia el STOCK del videojuego.
- *
- * ---------------------------------------------------------------------
- *  ¿QUÉ ES UNA TRANSACCIÓN?
- * ---------------------------------------------------------------------
- *  Es un grupo de operaciones que deben hacerse TODAS o NINGUNA.
- *
- *  Ejemplo al registrar una venta:
- *     1) INSERT de la venta
- *     2) UPDATE del stock del videojuego (restar las unidades vendidas)
- *
- *  Imagina que el paso 1 funciona pero el 2 falla: tendríamos una venta
- *  registrada y el stock sin descontar -> datos incoherentes.
- *  Con una transacción, si falla cualquier paso, se deshace todo.
- *
- *  Cómo se hace en JDBC (siempre con la MISMA conexión):
- *
- *     conexion.setAutoCommit(false);   // 1. "No guardes nada hasta que yo te diga"
- *     try {
- *         ...operaciones...            // 2. Hacemos todos los pasos
- *         conexion.commit();           // 3. Todo bien -> se guardan TODOS los cambios
- *     } catch (SQLException e) {
- *         conexion.rollback();         // 4. Algo falló -> se deshacen TODOS los cambios
- *         throw e;                     //    y avisamos hacia arriba del error
- *     } finally {
- *         conexion.setAutoCommit(true); // 5. Dejamos la conexión como estaba
- *     }
- *
- *  Por defecto JDBC tiene autoCommit = true: cada sentencia se guarda en cuanto
- *  se ejecuta. Por eso hay que desactivarlo para agrupar varias sentencias.
- *
- *  Como la conexión es la del Singleton, TODAS las operaciones de la transacción
- *  usan la misma conexión (requisito imprescindible para que la transacción funcione).
- *
- * Para conseguir este DAO se usa: DaoFactory.getVentaDao()
- */
 public class VentaDaoImpl implements IDao<Venta, Integer> {
 
-    /** Pide al Singleton la conexión compartida. */
     private Connection obtenerConexion() throws SQLException {
         return ConexionBD.getInstancia().getConexion();
     }
 
     @Override
     public void crearTablaSiNoExiste() throws SQLException {
-        // Las FOREIGN KEY obligan a que id_cliente e id_videojuego existan en sus tablas.
-        // Por eso esta tabla debe crearse DESPUÉS de "cliente" y "videojuego".
+
         String sql = """
                 CREATE TABLE IF NOT EXISTS venta (
                     id            INT AUTO_INCREMENT PRIMARY KEY,
@@ -113,40 +68,27 @@ public class VentaDaoImpl implements IDao<Venta, Integer> {
         return null;
     }
 
-    /**
-     * REGISTRAR UNA VENTA (transacción).
-     *
-     * Pasos:
-     *   1. Comprobar que el videojuego existe.
-     *   2. Comprobar que hay stock suficiente.
-     *   3. Calcular el importe (precio * unidades).
-     *   4. Insertar la venta.
-     *   5. Restar las unidades vendidas al stock.
-     *   6. commit() si todo va bien  /  rollback() si algo falla.
-     */
     @Override
     public boolean insertar(Venta venta) throws SQLException {
         Connection conexion = obtenerConexion();
-        conexion.setAutoCommit(false); // Empieza la transacción
+        conexion.setAutoCommit(false);
 
         try {
-            // Pasos 1 y 2: el videojuego existe y tiene stock suficiente
+
             Videojuego videojuego = leerVideojuegoDeLaVenta(conexion, venta.getIdVideojuego());
             comprobarStockSuficiente(videojuego, venta.getUnidades());
 
-            // Paso 3: el importe lo calculamos aquí, con el precio real guardado en la BD
             venta.setImporteTotal(calcularImporte(videojuego.getPrecio(), venta.getUnidades()));
 
-            // Paso 4: insertar la venta
             String sqlInsertarVenta = "INSERT INTO venta (id_cliente, id_videojuego, fecha_venta, unidades, importe_total) "
                     + "VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement sentencia = conexion.prepareStatement(sqlInsertarVenta, Statement.RETURN_GENERATED_KEYS)) {
                 sentencia.setInt(1, venta.getIdCliente());
                 sentencia.setInt(2, venta.getIdVideojuego());
-                sentencia.setDate(3, Date.valueOf(venta.getFechaVenta())); // LocalDate -> java.sql.Date
+                sentencia.setDate(3, Date.valueOf(venta.getFechaVenta()));
                 sentencia.setInt(4, venta.getUnidades());
                 sentencia.setDouble(5, venta.getImporteTotal());
-                sentencia.executeUpdate(); // si el cliente no existe, la clave foránea lanza SQLException
+                sentencia.executeUpdate();
 
                 try (ResultSet idsGenerados = sentencia.getGeneratedKeys()) {
                     if (idsGenerados.next()) {
@@ -155,54 +97,39 @@ public class VentaDaoImpl implements IDao<Venta, Integer> {
                 }
             }
 
-            // Paso 5: restar del stock (sumamos una cantidad negativa)
             sumarAlStock(conexion, venta.getIdVideojuego(), -venta.getUnidades());
 
-            // Paso 6a: todo ha ido bien -> guardamos los cambios definitivamente
             conexion.commit();
             return true;
 
         } catch (SQLException error) {
-            // Paso 6b: algo ha fallado -> deshacemos TODO lo hecho desde setAutoCommit(false)
+
             conexion.rollback();
-            throw error; // el Main se encargará de mostrar el mensaje
+            throw error;
         } finally {
-            // Pase lo que pase, volvemos a dejar la conexión en modo normal
+
             conexion.setAutoCommit(true);
         }
     }
 
-    /**
-     * MODIFICAR UNA VENTA (transacción).
-     *
-     * Si cambian las unidades o el videojuego, el stock también tiene que cambiar.
-     * La forma más sencilla de hacerlo bien es:
-     *   1. Devolver al stock las unidades de la venta ANTIGUA (como si se anulase).
-     *   2. Comprobar que hay stock para la venta NUEVA.
-     *   3. Actualizar la venta con el nuevo importe.
-     *   4. Restar del stock las unidades de la venta NUEVA.
-     */
     @Override
     public boolean modificar(Venta ventaNueva) throws SQLException {
         Connection conexion = obtenerConexion();
         conexion.setAutoCommit(false);
 
         try {
-            // Leemos cómo era la venta antes del cambio
+
             Venta ventaAntigua = buscarPorId(ventaNueva.getId());
             if (ventaAntigua == null) {
-                conexion.rollback(); // no hemos cambiado nada, pero cerramos la transacción limpiamente
-                return false;        // no existe esa venta
+                conexion.rollback();
+                return false;
             }
 
-            // Paso 1: devolver las unidades antiguas a su videojuego
             sumarAlStock(conexion, ventaAntigua.getIdVideojuego(), ventaAntigua.getUnidades());
 
-            // Paso 2: comprobar el videojuego nuevo (puede ser el mismo) y su stock
             Videojuego videojuego = leerVideojuegoDeLaVenta(conexion, ventaNueva.getIdVideojuego());
             comprobarStockSuficiente(videojuego, ventaNueva.getUnidades());
 
-            // Paso 3: actualizar la venta (recalculando el importe)
             ventaNueva.setImporteTotal(calcularImporte(videojuego.getPrecio(), ventaNueva.getUnidades()));
             String sqlModificarVenta = "UPDATE venta SET id_cliente = ?, id_videojuego = ?, fecha_venta = ?, "
                     + "unidades = ?, importe_total = ? WHERE id = ?";
@@ -216,7 +143,6 @@ public class VentaDaoImpl implements IDao<Venta, Integer> {
                 sentencia.executeUpdate();
             }
 
-            // Paso 4: restar las unidades nuevas
             sumarAlStock(conexion, ventaNueva.getIdVideojuego(), -ventaNueva.getUnidades());
 
             conexion.commit();
@@ -230,10 +156,6 @@ public class VentaDaoImpl implements IDao<Venta, Integer> {
         }
     }
 
-    /**
-     * ELIMINAR UNA VENTA (transacción).
-     * Al borrar una venta (por ejemplo, una devolución), las unidades vuelven al stock.
-     */
     @Override
     public boolean eliminar(Integer id) throws SQLException {
         Connection conexion = obtenerConexion();
@@ -246,13 +168,11 @@ public class VentaDaoImpl implements IDao<Venta, Integer> {
                 return false;
             }
 
-            // 1. Borrar la venta
             try (PreparedStatement sentencia = conexion.prepareStatement("DELETE FROM venta WHERE id = ?")) {
                 sentencia.setInt(1, id);
                 sentencia.executeUpdate();
             }
 
-            // 2. Devolver las unidades al stock del videojuego
             sumarAlStock(conexion, ventaABorrar.getIdVideojuego(), ventaABorrar.getUnidades());
 
             conexion.commit();
@@ -266,20 +186,9 @@ public class VentaDaoImpl implements IDao<Venta, Integer> {
         }
     }
 
-    // =====================================================================
-    //  Métodos auxiliares (privados: solo se usan dentro de esta clase)
-    // =====================================================================
 
-    /**
-     * Lee el precio y el stock de un videojuego.
-     * Si no existe, lanza una SQLException -> eso provoca el rollback() de la transacción.
-     *
-     * "FOR UPDATE" bloquea esa fila hasta el commit/rollback, para que nadie más
-     * pueda cambiar el stock mientras estamos registrando la venta.
-     *
-     * (Hacemos esta consulta aquí y no con VideojuegoDaoImpl porque así estamos seguros
-     * de que va dentro de la misma transacción y usa la misma conexión.)
-     */
+
+
     private Videojuego leerVideojuegoDeLaVenta(Connection conexion, int idVideojuego) throws SQLException {
         String sql = "SELECT id, titulo, precio, stock FROM videojuego WHERE id = ? FOR UPDATE";
 
@@ -299,7 +208,6 @@ public class VentaDaoImpl implements IDao<Venta, Integer> {
         }
     }
 
-    /** Si no hay unidades suficientes, lanza una SQLException -> provoca el rollback(). */
     private void comprobarStockSuficiente(Videojuego videojuego, int unidadesPedidas) throws SQLException {
         if (videojuego.getStock() < unidadesPedidas) {
             throw new SQLException("Stock insuficiente de \"" + videojuego.getTitulo() + "\": quedan "
@@ -307,10 +215,6 @@ public class VentaDaoImpl implements IDao<Venta, Integer> {
         }
     }
 
-    /**
-     * Suma "cantidad" al stock de un videojuego.
-     * Con cantidad negativa, resta (por ejemplo, -3 quita 3 unidades).
-     */
     private void sumarAlStock(Connection conexion, int idVideojuego, int cantidad) throws SQLException {
         String sql = "UPDATE videojuego SET stock = stock + ? WHERE id = ?";
 
@@ -321,18 +225,16 @@ public class VentaDaoImpl implements IDao<Venta, Integer> {
         }
     }
 
-    /** precio * unidades, redondeado a 2 decimales (céntimos). */
     private double calcularImporte(double precio, int unidades) {
         return Math.round(precio * unidades * 100) / 100.0;
     }
 
-    /** Convierte la fila actual del ResultSet en un objeto Venta. */
     private Venta convertirFilaEnVenta(ResultSet fila) throws SQLException {
         return new Venta(
                 fila.getInt("id"),
                 fila.getInt("id_cliente"),
                 fila.getInt("id_videojuego"),
-                fila.getDate("fecha_venta").toLocalDate(), // java.sql.Date -> LocalDate
+                fila.getDate("fecha_venta").toLocalDate(),
                 fila.getInt("unidades"),
                 fila.getDouble("importe_total")
         );

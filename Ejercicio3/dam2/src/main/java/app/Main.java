@@ -13,36 +13,10 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * =====================================================================
- *  MAIN: la aplicación de consola (menús)
- * =====================================================================
- *
- * Esta clase solo se encarga de HABLAR CON EL USUARIO: mostrar menús,
- * pedir datos por teclado y enseñar resultados.
- *
- * Fíjate en lo que NO hace:
- *   - No tiene ni una línea de SQL (todo el SQL está en los DAO).
- *   - No hace "new VideojuegoDaoImpl()" (los DAO se piden a DaoFactory).
- *   - No abre ni gestiona la conexión (eso es cosa del Singleton ConexionBD).
- *
- * Así cada clase tiene UNA responsabilidad, y si cambia la base de datos,
- * esta clase no hay que tocarla.
- *
- * Esquema de cómo se relaciona todo:
- *
- *    Main  --pide DAO-->  DaoFactory  --crea-->  VideojuegoDaoImpl / ClienteDaoImpl / VentaDaoImpl
- *     |                                                   |
- *     +----- usa los métodos de IDao ------------------->+---pide la conexión---> ConexionBD (Singleton)
- *                                                                                      |
- *                                                                                  Base de datos
- */
 public class Main {
 
-    // Un único Scanner para leer del teclado en todo el programa
     private static final Scanner teclado = new Scanner(System.in);
 
-    // Los DAO se piden a la FACTORÍA. Fíjate en el tipo: la INTERFAZ IDao, no la clase Impl.
     private static final IDao<Videojuego, Integer> videojuegoDao = DaoFactory.getVideojuegoDao();
     private static final IDao<Cliente, Integer> clienteDao = DaoFactory.getClienteDao();
     private static final IDao<Venta, Integer> ventaDao = DaoFactory.getVentaDao();
@@ -54,25 +28,18 @@ public class Main {
         } catch (SQLException error) {
             System.out.println("No se ha podido conectar con la base de datos: " + error.getMessage());
         } finally {
-            // Se ejecuta SIEMPRE al terminar: cerramos la única conexión del Singleton
+
             ConexionBD.cerrarConexion();
         }
     }
 
-    /**
-     * Crea las tablas si no existen.
-     * El orden importa: "venta" tiene claves foráneas hacia "cliente" y "videojuego",
-     * así que esas dos tienen que existir antes.
-     */
     private static void prepararBaseDeDatos() throws SQLException {
         videojuegoDao.crearTablaSiNoExiste();
         clienteDao.crearTablaSiNoExiste();
         ventaDao.crearTablaSiNoExiste();
     }
 
-    // =====================================================================
-    //  MENÚ PRINCIPAL
-    // =====================================================================
+
 
     private static void menuPrincipal() {
         int opcion;
@@ -95,9 +62,7 @@ public class Main {
         } while (opcion != 0);
     }
 
-    // =====================================================================
-    //  SUBMENÚ: VIDEOJUEGOS
-    // =====================================================================
+
 
     private static void menuVideojuegos() {
         int opcion;
@@ -112,8 +77,7 @@ public class Main {
             System.out.println("0. Volver");
             opcion = leerEntero("Elige una opción: ");
 
-            // Todas las opciones pueden fallar con la base de datos, así que las
-            // envolvemos en un único try/catch en vez de repetirlo en cada método.
+
             try {
                 switch (opcion) {
                     case 1 -> listarVideojuegos();
@@ -121,7 +85,7 @@ public class Main {
                     case 3 -> anadirVideojuego();
                     case 4 -> modificarVideojuego();
                     case 5 -> eliminarVideojuego();
-                    case 0 -> { } // no hacemos nada: el bucle termina y volvemos al menú principal
+                    case 0 -> { }
                     default -> System.out.println("Opción no válida.");
                 }
             } catch (SQLException error) {
@@ -136,7 +100,7 @@ public class Main {
             System.out.println("No hay videojuegos registrados.");
             return;
         }
-        // Recorremos la lista e imprimimos cada uno (usa el toString() de Videojuego)
+
         for (Videojuego videojuego : videojuegos) {
             System.out.println(videojuego);
         }
@@ -155,10 +119,9 @@ public class Main {
         double precio = leerDecimalNoNegativo("Precio: ");
         int stock = leerEnteroNoNegativo("Stock: ");
 
-        // Creamos el objeto (sin id) y se lo damos al DAO para que lo guarde
         Videojuego nuevoVideojuego = new Videojuego(titulo, plataforma, genero, precio, stock);
         if (videojuegoDao.insertar(nuevoVideojuego)) {
-            // Después de insertar, el DAO le ha puesto el id generado
+
             System.out.println("Videojuego añadido con ID " + nuevoVideojuego.getId() + ".");
         }
     }
@@ -174,14 +137,12 @@ public class Main {
         System.out.println("Datos actuales: " + videojuego);
         System.out.println("(Pulsa Intro sin escribir nada para dejar un campo como está)");
 
-        // Cambiamos el objeto en memoria...
         videojuego.setTitulo(leerTextoOpcional("Título", videojuego.getTitulo()));
         videojuego.setPlataforma(leerTextoOpcional("Plataforma", videojuego.getPlataforma()));
         videojuego.setGenero(leerTextoOpcional("Género", videojuego.getGenero()));
         videojuego.setPrecio(leerDecimalOpcional("Precio", videojuego.getPrecio()));
         videojuego.setStock(leerEnteroOpcional("Stock", videojuego.getStock()));
 
-        // ...y le pedimos al DAO que guarde esos cambios en la base de datos
         if (videojuegoDao.modificar(videojuego)) {
             System.out.println("Videojuego modificado.");
         }
@@ -197,9 +158,7 @@ public class Main {
         System.out.println(eliminado ? "Videojuego eliminado." : "No existe ningún videojuego con ese ID.");
     }
 
-    // =====================================================================
-    //  SUBMENÚ: CLIENTES
-    // =====================================================================
+
 
     private static void menuClientes() {
         int opcion;
@@ -290,9 +249,7 @@ public class Main {
         System.out.println(eliminado ? "Cliente eliminado." : "No existe ningún cliente con ese ID.");
     }
 
-    // =====================================================================
-    //  SUBMENÚ: VENTAS
-    // =====================================================================
+
 
     private static void menuVentas() {
         int opcion;
@@ -344,11 +301,6 @@ public class Main {
         }
     }
 
-    /**
-     * Registrar venta: aquí solo pedimos los datos.
-     * La TRANSACCIÓN (insertar venta + descontar stock, con commit/rollback)
-     * la hace VentaDaoImpl.insertar(). El Main no necesita saber cómo.
-     */
     private static void registrarVenta() throws SQLException {
         int idCliente = leerEntero("ID del cliente: ");
         if (clienteDao.buscarPorId(idCliente) == null) {
@@ -388,7 +340,6 @@ public class Main {
             return;
         }
 
-        // El DAO recalcula el importe y ajusta el stock dentro de una transacción
         if (ventaDao.modificar(venta)) {
             System.out.printf("Venta modificada. Nuevo importe: %.2f €%n", venta.getImporteTotal());
         }
@@ -404,10 +355,6 @@ public class Main {
         System.out.println(eliminada ? "Venta eliminada y stock devuelto." : "No existe ninguna venta con ese ID.");
     }
 
-    /**
-     * Muestra una venta con el nombre del cliente y el título del juego,
-     * que es más fácil de leer que solo los números de id.
-     */
     private static void mostrarVentaConNombres(Venta venta) throws SQLException {
         Cliente cliente = clienteDao.buscarPorId(venta.getIdCliente());
         Videojuego videojuego = videojuegoDao.buscarPorId(venta.getIdVideojuego());
@@ -420,36 +367,28 @@ public class Main {
                 venta.getUnidades(), tituloVideojuego, venta.getImporteTotal());
     }
 
-    // =====================================================================
-    //  ERRORES
-    // =====================================================================
 
-    /**
-     * Traduce los errores más típicos de la base de datos a un mensaje entendible.
-     * getSQLState() devuelve un código estándar de 5 caracteres que indica el tipo de error.
-     */
+
+
     private static void mostrarErrorBaseDeDatos(SQLException error) {
         String codigoError = error.getSQLState();
 
         if ("23503".equals(codigoError)) {
-            // 23503 = violación de clave foránea
+
             System.out.println("Error: hay datos relacionados. Por ejemplo, no se puede borrar un cliente o "
                     + "videojuego que tiene ventas, ni registrar una venta de un cliente que no existe.");
         } else if ("23505".equals(codigoError)) {
-            // 23505 = valor duplicado en un campo UNIQUE
+
             System.out.println("Error: ya existe un registro con ese valor (por ejemplo, ese email ya está registrado).");
         } else {
-            // Cualquier otro error, incluidos los nuestros ("Stock insuficiente...")
+
             System.out.println("Error: " + error.getMessage());
         }
     }
 
-    // =====================================================================
-    //  MÉTODOS PARA LEER DEL TECLADO
-    //  (repiten la pregunta hasta que el usuario escribe algo válido)
-    // =====================================================================
 
-    /** Lee un texto que no puede estar vacío. */
+
+
     private static String leerTexto(String mensaje) {
         while (true) {
             System.out.print(mensaje);
@@ -461,13 +400,11 @@ public class Main {
         }
     }
 
-    /** Lee un número entero cualquiera. */
     private static int leerEntero(String mensaje) {
         while (true) {
             System.out.print(mensaje);
             try {
-                // Leemos la línea entera y la convertimos. Así evitamos los problemas
-                // típicos de mezclar nextInt() con nextLine().
+
                 return Integer.parseInt(teclado.nextLine().trim());
             } catch (NumberFormatException e) {
                 System.out.println("Escribe un número entero.");
@@ -475,7 +412,6 @@ public class Main {
         }
     }
 
-    /** Lee un entero mayor o igual que 0 (por ejemplo, el stock). */
     private static int leerEnteroNoNegativo(String mensaje) {
         while (true) {
             int numero = leerEntero(mensaje);
@@ -486,7 +422,6 @@ public class Main {
         }
     }
 
-    /** Lee un entero mayor que 0 (por ejemplo, las unidades de una venta). */
     private static int leerEnteroPositivo(String mensaje) {
         while (true) {
             int numero = leerEntero(mensaje);
@@ -497,7 +432,6 @@ public class Main {
         }
     }
 
-    /** Lee un número decimal mayor o igual que 0. Acepta coma o punto (19,99 o 19.99). */
     private static double leerDecimalNoNegativo(String mensaje) {
         while (true) {
             System.out.print(mensaje);
@@ -513,17 +447,12 @@ public class Main {
         }
     }
 
-    /**
-     * Para MODIFICAR: muestra el valor actual entre corchetes.
-     * Si el usuario pulsa Intro sin escribir, se queda el valor actual.
-     */
     private static String leerTextoOpcional(String campo, String valorActual) {
         System.out.print(campo + " [" + valorActual + "]: ");
         String texto = teclado.nextLine().trim();
         return texto.isEmpty() ? valorActual : texto;
     }
 
-    /** Igual que leerTextoOpcional, pero para números enteros. */
     private static int leerEnteroOpcional(String campo, int valorActual) {
         while (true) {
             System.out.print(campo + " [" + valorActual + "]: ");
@@ -543,7 +472,6 @@ public class Main {
         }
     }
 
-    /** Igual que leerTextoOpcional, pero para números decimales. */
     private static double leerDecimalOpcional(String campo, double valorActual) {
         while (true) {
             System.out.print(campo + " [" + valorActual + "]: ");
@@ -563,7 +491,6 @@ public class Main {
         }
     }
 
-    /** Lee una fecha con formato AAAA-MM-DD. Si se deja vacío, devuelve "fechaPorDefecto". */
     private static LocalDate leerFecha(String mensaje, LocalDate fechaPorDefecto) {
         while (true) {
             System.out.print(mensaje);
@@ -572,14 +499,13 @@ public class Main {
                 return fechaPorDefecto;
             }
             try {
-                return LocalDate.parse(texto); // LocalDate entiende directamente el formato AAAA-MM-DD
+                return LocalDate.parse(texto);
             } catch (DateTimeParseException e) {
                 System.out.println("Formato incorrecto. Ejemplo: 2026-11-21");
             }
         }
     }
 
-    /** Pregunta sí/no. Devuelve true solo si el usuario responde "s". */
     private static boolean confirmar(String mensaje) {
         System.out.print(mensaje);
         return teclado.nextLine().trim().equalsIgnoreCase("s");

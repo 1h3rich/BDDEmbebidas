@@ -1,34 +1,31 @@
 package dam2.dao;
 
-public class CursoDao implements IDao {
+import com.db4o.query.Query;
+import dam2.modelo.Curso;
+
+public class CursoDao extends DaoBase<Curso> {
+    public CursoDao() {
+        super(Curso.class);
+    }
+
     @Override
-    public boolean insertar(Object obj) {
-        // Implementación de la inserción de un curso en la base de datos
-        return false;
+    protected int obtenerId(Curso curso) {
+        return curso.getId();
+    }
+
+    @Override
+    protected void copiarDatos(Curso origen, Curso destino) {
+        destino.setNombre(origen.getNombre());
     }
 
     @Override
     public boolean eliminar(int id) {
-        // Implementación de la eliminación de un curso por su ID
-        return false;
+        Query consulta = db().query();
+        consulta.constrain(dam2.modelo.Asignatura.class);
+        consulta.descend("curso").descend("id").constrain(id);
+        if (consulta.execute().hasNext()) {
+            return false;
+        }
+        return super.eliminar(id);
     }
-
-    @Override
-    public boolean modificar(Object obj) {
-        // Implementación de la modificación de un curso en la base de datos
-        return false;
-    }
-
-    @Override
-    public Object buscarPorId(int id) {
-        // Implementación de la búsqueda de un curso por su ID
-        return null;
-    }
-
-    @Override
-    public Object buscarTodos() {
-        // Implementación de la búsqueda de todos los cursos en la base de datos
-        return null;
-    }
-
 }

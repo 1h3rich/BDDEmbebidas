@@ -11,18 +11,12 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <!-- Para que las tildes y la ñ se compilen bien en cualquier sistema -->
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
-        <!--
-            H2: base de datos embebida (se guarda en un fichero dentro del proyecto,
-            no hace falta instalar ningún servidor).
-            Si en el futuro quieres usar MySQL, solo tienes que añadir el conector
-            de MySQL aquí y cambiar la URL en database/ConexionBD.java.
-            Gracias al patrón DAO + Singleton, el resto del programa no cambia.
-        -->
+
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -32,7 +26,7 @@
 
     <build>
         <plugins>
-            <!-- Permite lanzar el programa con: mvn compile exec:java -->
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>

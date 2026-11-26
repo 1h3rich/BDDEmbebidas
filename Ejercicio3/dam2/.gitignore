@@ -1,5 +1,3 @@
-# Clases compiladas por Maven
 target/
 
-# Fichero de la base de datos H2 (se crea solo al ejecutar el programa)
 datos/

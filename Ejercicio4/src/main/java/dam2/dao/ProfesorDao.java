@@ -1,34 +1,45 @@
 package dam2.dao;
 
-public class ProfesorDao implements IDao {
+import com.db4o.ObjectSet;
+import com.db4o.query.Predicate;
+import com.db4o.query.Query;
+import dam2.modelo.Profesor;
+
+import java.util.List;
+
+public class ProfesorDao extends DaoBase<Profesor> {
+    public ProfesorDao() {
+        super(Profesor.class);
+    }
+
     @Override
-    public boolean insertar(Object obj) {
-        
-        return false;
+    protected int obtenerId(Profesor profesor) {
+        return profesor.getId();
+    }
+
+    @Override
+    protected void copiarDatos(Profesor origen, Profesor destino) {
+        destino.setNombre(origen.getNombre());
+        destino.setApellidos(origen.getApellidos());
     }
 
     @Override
     public boolean eliminar(int id) {
-        // Implementación de la eliminación de un profesor por su ID
-        return false;
+        Query consulta = db().query();
+        consulta.constrain(dam2.modelo.Asignatura.class);
+        consulta.descend("profesor").descend("id").constrain(id);
+        if (consulta.execute().hasNext()) {
+            return false;
+        }
+        return super.eliminar(id);
     }
 
-    @Override
-    public boolean modificar(Object obj) {
-        // Implementación de la modificación de un profesor en la base de datos
-        return false;
+    public List<Profesor> buscarPorApellidoNq(String apellido) {
+        ObjectSet resultado = db().query(new Predicate(Profesor.class) {
+            public boolean match(Profesor profesor) {
+                return profesor.getApellidos().equalsIgnoreCase(apellido);
+            }
+        });
+        return convertir(resultado);
     }
-
-    @Override
-    public Object buscarPorId(int id) {
-        // Implementación de la búsqueda de un profesor por su ID
-        return null;
-    }
-
-    @Override
-    public Object buscarTodos() {
-        // Implementación de la búsqueda de todos los profesores en la base de datos
-        return null;
-    }
-
 }
